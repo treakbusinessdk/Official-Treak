@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Treak – find dit første job</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--d:"Inter","Segoe UI",Arial,sans-serif;--b:"Inter","Segoe UI",Arial,sans-serif}
+:root{--bg:#fff;--bg2:#f5f3fe;--ink:#17112b;--tx:#17112b;--pane:#fff;--li:#5b3fe0;--onli:#fff;--sec:#ece8ff;--acc:#5b3fe0;--co:#ff7b6b;--bu:#ffc233;--mt:#5a5580;--bd:#e6e2f6;--bd2:#cfc8ef;--c1:#ff8a7a;--c2:#ffd666;--c3:#c3b3ff;--c4:#7fe6cc}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+body{font:400 17px/1.6 var(--b);color:var(--tx);background:var(--bg);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--acc);outline-offset:3px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.proto{background:var(--ink);color:#fff;font-size:13px;padding:7px 12px;text-align:center}
+.site{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--bd)}
+nav{display:flex;justify-content:space-between;align-items:center;height:68px}
+.logo{font:800 26px var(--d);letter-spacing:-.04em;text-decoration:none;display:flex;align-items:center;gap:8px}
+.logo i{width:12px;height:12px;border-radius:50%;background:var(--bu)}
+.navr{display:flex;gap:26px;align-items:center}
+.navr a{text-decoration:none;font-weight:600;font-size:15px;color:var(--mt)}
+.navr a:hover{color:var(--ink)}
+.pill{border:0;background:var(--ink);color:#fff;border-radius:99px;padding:9px 18px;font-weight:600;font-size:15px;cursor:pointer}
+.pill:hover{background:var(--li)}
+.eyebrow{display:inline-block;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--acc);margin-bottom:14px}
+section{padding:84px 0}
+.hero{padding:64px 0 72px}
+.hero-g{display:grid;grid-template-columns:1.1fr .9fr;gap:56px;align-items:center}
+h1{font:800 clamp(44px,6.6vw,84px)/1 var(--d);letter-spacing:-.045em}
+.sub{margin:22px 0 32px;max-width:44ch;font-size:20px;color:var(--mt)}
+.cta{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.trust{margin-top:24px;font-size:14px;color:var(--mt);display:flex;gap:18px;flex-wrap:wrap}
+.trust span::before{content:"✓ ";color:var(--acc);font-weight:700}
+.prev{position:relative;height:380px;max-width:320px;width:100%;margin:0 auto;isolation:isolate}
+.prev::before{content:"";position:absolute;inset:-9% -18%;background:var(--sec);border-radius:50%;z-index:-1}
+.prev .card{box-shadow:0 18px 40px rgba(23,17,43,.16)}
+.prev .card:nth-child(1){transform:rotate(-8deg) translate(-34px,14px);background:var(--c3)}
+.prev .card:nth-child(2){transform:rotate(6deg) translate(30px,8px);background:var(--c1)}
+.prev .card:nth-child(3){transform:rotate(-1deg)}
+.fl{position:absolute;background:#fff;border-radius:99px;padding:7px 14px;font-size:14px;font-weight:600;box-shadow:0 8px 24px rgba(23,17,43,.14);z-index:2;white-space:nowrap}
+.fl.a{top:-8px;right:-26px}.fl.b{bottom:24px;left:-40px}
+.feat{padding:0 0 84px}
+.feat-g{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.ft{background:var(--bg2);border-radius:24px;padding:28px}
+.ic{width:50px;height:50px;border-radius:15px;background:var(--bu);display:grid;place-items:center;margin-bottom:18px}
+.ft h3{font:700 20px/1.2 var(--d);letter-spacing:-.02em;margin-bottom:6px}
+.ft p{color:var(--mt);font-size:16px}
+.soft{background:var(--bg2)}
+.head{max-width:640px;margin-bottom:40px}
+h2{font:800 clamp(30px,4.6vw,48px)/1.05 var(--d);letter-spacing:-.04em;margin-bottom:14px}
+.lead{color:var(--mt);font-size:18px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.age{background:#fff;border-radius:24px;padding:22px 24px;box-shadow:0 8px 28px rgba(23,17,43,.08);max-width:440px;margin-top:26px}
+.age output{display:block;font:800 30px var(--d);letter-spacing:-.03em;margin-bottom:10px}
+input[type=range]{width:100%;accent-color:var(--acc);height:28px}
+.ticks{display:flex;justify-content:space-between;font-size:12px;color:var(--mt)}
+.under{background:none;border:0;color:var(--li);text-decoration:underline;cursor:pointer;margin-top:10px;font-size:14px;padding:0}
+#deck{position:relative;height:430px;max-width:350px;margin:0 auto}
+.card{position:absolute;inset:0;border-radius:28px;padding:24px;display:flex;flex-direction:column;justify-content:space-between;color:var(--ink);touch-action:pan-y;user-select:none;transition:transform .25s}
+.card.top{cursor:grab}
+.card .firm{font-weight:600}
+.card h3{font:800 34px/1.02 var(--d);letter-spacing:-.04em;margin-bottom:10px}
+.card .w{font:800 52px/1 var(--d);letter-spacing:-.05em}
+.card .w small{font:600 16px var(--b);letter-spacing:0;margin-left:6px}
+.card .desc{font-size:15px;line-height:1.45;margin-bottom:10px}
+.card.c1{background:var(--c1)}.card.c2{background:var(--c2)}.card.c3{background:var(--c3)}.card.c4{background:var(--c4)}
+#deck .card{box-shadow:0 12px 32px rgba(23,17,43,.14)}
+.tg{display:inline-block;font-size:13px;font-weight:600;border:2px solid var(--ink);border-radius:99px;padding:1px 10px;margin:0 6px 6px 0}
+.end{position:absolute;inset:0;border:2px dashed var(--bd2);border-radius:28px;padding:28px;display:flex;flex-direction:column;justify-content:center;gap:10px;background:#fff}
+.end h3{font:800 28px/1.05 var(--d);letter-spacing:-.03em}
+#acts{display:flex;justify-content:center;gap:10px;margin-top:20px;flex-wrap:wrap}
+#info{text-align:center;margin-top:12px;font-size:15px;color:var(--mt)}
+.btn{background:var(--bu);color:var(--ink);border:0;border-radius:14px;padding:12px 22px;font-weight:700;cursor:pointer;transition:transform .15s,filter .15s}
+.btn:hover{filter:brightness(1.06);transform:translateY(-1px)}
+.btn.big{padding:16px 28px;font-size:18px;text-decoration:none;display:inline-block}
+.btn.ghost{background:#fff;color:var(--ink);border:2px solid var(--bd2)}
+.btn.ghost:hover{border-color:var(--ink)}
+.btn.co{background:var(--co)}
+.boxes{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.box{border:1.5px solid var(--bd);border-radius:24px;padding:26px}
+.box h3{font:700 21px var(--d);letter-spacing:-.02em;margin-bottom:8px}
+ul{list-style:none;padding:0}
+li{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:12px 0;border-top:1px solid var(--bd)}
+li span{flex:1}
+li em{color:var(--acc);font-style:normal;font-weight:700}
+.mini{background:none;border:2px solid var(--li);border-radius:10px;padding:2px 12px;cursor:pointer;font-size:14px;font-weight:600}
+.mini:hover{background:var(--li);color:var(--onli)}
+.mute{color:var(--mt)}
+.dark{background:var(--ink);color:#fff}
+.dark h2{color:#fff}
+.dark .lead{color:#cfc8ef}
+.dark .eyebrow{color:var(--bu)}
+.cta-band{text-align:center}
+.cta-band .lead{margin:0 auto 28px;max-width:46ch}
+form{display:grid;gap:14px}
+form .btn{background:var(--ink);color:#fff;justify-self:start}
+label{display:grid;gap:4px;font-weight:600;font-size:15px}
+input:not([type=range]):not([type=checkbox]),select,textarea{border:2px solid var(--bd2);border-radius:10px;padding:10px 12px;background:#fff;color:var(--ink);font-weight:400}
+input:focus,select:focus,textarea:focus{border-color:var(--li)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.chk{display:flex;gap:10px;align-items:flex-start;font-weight:400}
+.chk input{margin-top:5px;width:18px;height:18px}
+.warn{background:var(--bg2);border-radius:10px;padding:10px 12px;font-size:15px}
+#par{display:grid;gap:14px}
+dialog{border:0;border-radius:22px;padding:0;width:min(560px,94vw);max-height:92vh;background:var(--pane);color:var(--ink)}
+dialog::backdrop{background:rgba(10,5,25,.6)}
+.dlg{padding:28px}
+.dlg h3{font:800 28px/1.05 var(--d);letter-spacing:-.03em}
+.dlg .top{display:flex;justify-content:space-between;gap:12px}
+.dlg p{margin:10px 0}
+.dlg .mini{border-color:var(--ink)}
+.x{background:none;border:0;font-size:28px;cursor:pointer;line-height:1}
+.rep{background:none;border:0;text-decoration:underline;cursor:pointer;font-size:14px;padding:0}
+#toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,120px);background:var(--ink);color:#fff;font-weight:600;padding:13px 20px;border-radius:12px;transition:transform .25s;max-width:92vw;z-index:9}
+#toast.on{transform:translate(-50%,0)}
+footer{background:var(--ink);color:#a9a0cf;font-size:14px;padding:28px 0;border-top:1px solid #2c2347}
+@media(max-width:860px){.hero-g,.two,.boxes,.feat-g,.row{grid-template-columns:1fr}.navr a{display:none}section{padding:56px 0}.hero{padding:40px 0 56px}.feat{padding-bottom:56px}.prev{height:340px;margin-top:24px}.fl.a{right:-4px}.fl.b{left:-6px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="proto">Prototype: jobbene er eksempler, og der sendes endnu ikke noget til virksomheder.</div>
+<header class="site"><div class="wrap"><nav><a class="logo" href="#top"><i></i>Treak</a><div class="navr"><a href="#find">Find job</a><a href="#mine">Mine jobs</a><button class="pill" id="pbtn" type="button">Min profil</button></div></nav></div></header>
+<main>
+<section class="hero" id="top"><div class="wrap hero-g">
+<div>
+<span class="eyebrow">For unge mellem 13 og 21 år</span>
+<h1>Dit første job starter her.</h1>
+<p class="sub">Treak hjælper dig med at finde jobs, du må have, hos lokale virksomheder. Lav en profil med dit CV, og ansøg med ét tryk.</p>
+<div class="cta"><button class="btn big" id="go" type="button">Opret profil og kom i gang</button><a class="btn big ghost" href="#find">Se jobs først</a></div>
+<div class="trust"><span>Gratis for unge</span><span>Kun lovlige jobs</span><span>Godkendte virksomheder</span></div>
+</div>
+<div class="prev" aria-hidden="true"><div class="card"></div><div class="card"></div><div class="card c2"><div class="firm">Café (eksempel), Østerbro</div><div><h3>Køkkenhjælp</h3><div class="w">95 kr.<small>i timen</small></div></div><div><p class="desc">Skær grønt, vask op og hold orden. Du lærer grundlæggende køkkenhygiejne.</p><div class="tgs"><span class="tg">Fra 15 år</span><span class="tg">Weekender 9-15</span></div></div></div><span class="fl a">Lovligt fra 15 år</span><span class="fl b">Godkendt virksomhed</span></div>
+</div></section>
+
+<section class="feat"><div class="wrap feat-g">
+<div class="ft"><div class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></div><h3>Kun jobs, du må have</h3><p>Vi viser kun jobs, der er lovlige i din alder, så du ikke spilder tid.</p></div>
+<div class="ft"><div class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 13h6M10 17h6"/></svg></div><h3>Én profil, ét tryk</h3><p>Lav din profil med CV én gang. Bagefter ansøger du på et sekund.</p></div>
+<div class="ft"><div class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V5l8-2v18"/><path d="M12 9l8 2v10"/><path d="M8 9h.01M8 13h.01M8 17h.01M16 15h.01M16 18h.01"/></svg></div><h3>Rigtige virksomheder</h3><p>Vi godkender virksomhederne, før deres jobs vises for dig.</p></div>
+</div></section>
+
+<section class="soft" id="find"><div class="wrap two">
+<div>
+<span class="eyebrow">Find job</span>
+<h2>Swipe dig frem til et job.</h2>
+<p class="lead">Vælg din alder, så viser vi kun de jobs, du må have. Træk kortet til højre, hvis jobbet er noget for dig, og til venstre, hvis det ikke er. Du kan også bruge knapperne.</p>
+<div class="age"><output id="al" for="rg"></output><input id="rg" type="range" min="13" max="21" value="15" aria-label="Din alder"><div class="ticks"><span>13</span><span>21</span></div><button class="under" id="u13" type="button">Jeg er under 13</button></div>
+</div>
+<div>
+<div id="deck" aria-live="polite"></div>
+<div id="acts"><button class="btn ghost" id="bs" type="button">Spring over</button><button class="btn ghost" id="bg" type="button">Gem</button><button class="btn co" id="ba" type="button">Ansøg</button></div>
+<p id="info"></p>
+</div>
+</div></section>
+
+<section id="mine"><div class="wrap">
+<div class="head"><span class="eyebrow">Dit overblik</span><h2>Dine jobs</h2></div>
+<div class="boxes">
+<div class="box"><h3>Gemte jobs</h3><ul id="ls"></ul></div>
+<div class="box"><h3>Ansøgt</h3><ul id="la"></ul></div>
+</div></div></section>
+
+<section class="dark cta-band"><div class="wrap"><span class="eyebrow">Klar?</span><h2>Dit første job er tættere på, end du tror.</h2><p class="lead">Opret din profil på et par minutter, og begynd at swipe.</p><button class="btn big" id="go2" type="button">Opret profil og kom i gang</button></div></section>
+</main>
+<footer><div class="wrap">Treak. Jobs for unge fra 13 år. Vilkår og privatlivspolitik indsættes her, før I går live.</div></footer>
+
+<dialog id="dlg"><div class="dlg" id="db"></div></dialog>
+<div id="toast" role="status"></div>
+
+<script>
+var JOBS=[
+{id:1,t:"Hjælper i bageri",firm:"Bageri (eksempel)",area:"Nørrebro",cat:"Butik",min:13,light:1,wage:78,hrs:"Lørdage 8-13",d:"Fyld hylder op, pak brød og sig hej til kunderne. Kassen er ikke en del af jobbet."},
+{id:2,t:"Oprydning på legeplads",firm:"Fritidsklub (eksempel)",area:"Amager",cat:"Service",min:13,light:1,wage:72,hrs:"Efter skole, 2 dage",d:"Let oprydning af legetøj og borde. En voksen viser dig, hvad du skal gøre."},
+{id:3,t:"Aviser på cykel",firm:"Lokalavis (eksempel)",area:"Frederiksberg",cat:"Udendørs",min:13,light:1,wage:65,hrs:"Torsdag eftermiddag",d:"Du deler aviser ud i et lille område tæt på dit hjem."},
+{id:4,t:"Hundelufter",firm:"Dyrepension (eksempel)",area:"Valby",cat:"Udendørs",min:13,light:1,wage:70,hrs:"Hverdage 15-17",d:"Gå tur med rolige hunde to ad gangen. En voksen vælger, hvilke hunde du må tage."},
+{id:5,t:"Pizzabud",firm:"Pizzeria (eksempel)",area:"Vesterbro",cat:"Mad",min:15,light:0,wage:92,hrs:"Fre-lør 17-21",d:"Lever pizzaer i nærområdet på cykel. Hjelm er et krav, og vi har en til dig."},
+{id:6,t:"Køkkenhjælp",firm:"Café (eksempel)",area:"Østerbro",cat:"Mad",min:15,light:0,wage:95,hrs:"Weekender 9-15",d:"Skær grønt, vask op og hold orden. Du lærer grundlæggende køkkenhygiejne."},
+{id:7,t:"Kassemedarbejder",firm:"Dagligvarebutik (eksempel)",area:"Nørrebro",cat:"Butik",min:16,light:0,wage:112,hrs:"Aftener og weekender",d:"Sid i kassen og hjælp kunder. Du bliver trænet de første to vagter."},
+{id:8,t:"Lagermedarbejder",firm:"Webshop (eksempel)",area:"Hvidovre",cat:"Service",min:18,light:0,wage:135,hrs:"Hverdage 8-16",d:"Pak ordrer, scan varer og hold styr på lageret. Kræver, at du er fyldt 18."}
+];
+var CI={"Butik":1,"Mad":2,"Service":3,"Udendørs":4};
+var age=15,skip=[],mine=[],sav=[],prof=null,cur=null;
+try{mine=JSON.parse(localStorage.getItem("v2_app"))||[];sav=JSON.parse(localStorage.getItem("v2_sav"))||[];prof=JSON.parse(localStorage.getItem("v2_prof"))}catch(e){}
+var $=function(s){return document.querySelector(s)};
+function put(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}
+function ok(j){return age>=j.min&&(age>=15||j.light)}
+function toast(m){var t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(toast.h);toast.h=setTimeout(function(){t.classList.remove("on")},3600)}
+function label(){$("#al").textContent=age<13?"Jeg er under 13 år":"Jeg er "+age+" år"}
+
+function deck(){
+ var D=$("#deck");D.innerHTML="";cur=null;label();
+ if(age<13){$("#acts").hidden=true;$("#info").textContent="";
+  D.innerHTML='<div class="end"><h3>Du er for ung endnu</h3><p>Børn under 13 år må som udgangspunkt ikke have et job. Kom tilbage, når du fylder 13.</p></div>';return}
+ var L=JOBS.filter(function(j){return ok(j)&&skip.indexOf(j.id)<0&&mine.indexOf(j.id)<0&&sav.indexOf(j.id)<0});
+ $("#info").textContent=L.length+(L.length===1?" job tilbage":" jobs tilbage")+" til dig";
+ if(!L.length){$("#acts").hidden=true;
+  D.innerHTML='<div class="end"><h3>Du har set alle jobs</h3><p>Nye jobs kommer, når virksomheder slår dem op.</p><div><button class="btn" id="rs" type="button">Se dem igen</button></div></div>';
+  $("#rs").onclick=function(){skip=[];deck()};return}
+ $("#acts").hidden=false;cur=L[0];
+ L.slice(0,3).reverse().forEach(function(j,i,a){
+  var k=a.length-1-i,c=document.createElement("div");c.className="card c"+CI[j.cat]+(k===0?" top":"");
+  c.style.transform="translateY("+k*16+"px) scale("+(1-k*.06)+")";
+  c.innerHTML='<div class="firm"></div><div><h3></h3><div class="w"></div></div><div><p class="desc"></p><div class="tgs"></div></div>';
+  c.querySelector(".firm").textContent=j.firm+", "+j.area;c.querySelector("h3").textContent=j.t;
+  c.querySelector(".w").innerHTML=j.wage+' kr.<small>i timen</small>';c.querySelector(".desc").textContent=j.d;
+  [ "Fra "+j.min+" år",j.hrs].concat(j.light?["Lettere arbejde"]:[]).forEach(function(t){var s=document.createElement("span");s.className="tg";s.textContent=t;c.querySelector(".tgs").appendChild(s)});
+  D.appendChild(c);if(k===0)drag(c)});
+}
+function drag(c){
+ var sx=0,dx=0,on=false;
+ c.onpointerdown=function(e){on=true;sx=e.clientX;c.setPointerCapture(e.pointerId);c.style.transition="none"};
+ c.onpointermove=function(e){if(!on)return;dx=e.clientX-sx;c.style.transform="translateX("+dx+"px) rotate("+dx/18+"deg)"};
+ c.onpointerup=function(){if(!on)return;on=false;c.style.transition="";
+  if(dx>110)fly(1);else if(dx<-110)fly(-1);else c.style.transform="";dx=0};
+}
+function fly(dir){var t=$("#deck .top");if(!t||!cur)return;var j=cur;cur=null;t.style.transition="transform .25s";
+ t.style.transform="translateX("+dir*520+"px) rotate("+dir*18+"deg)";
+ setTimeout(function(){dir>0?applyJob(j):skipJob(j)},220)}
+function skipJob(j){skip.push(j.id);deck()}
+function saveJob(j){if(!j)return;sav.push(j.id);put("v2_sav",sav);toast("Gemt under Mine jobs.");deck();lists()}
+function applyJob(j){
+ if(!prof){toast("Opret først din profil med CV.");deck();pdlg();return}
+ var d=$("#dlg"),B=$("#db");
+ B.innerHTML='<div class="top"><h3></h3><button class="x" aria-label="Luk" type="button">×</button></div><p class="mm"></p><p class="who"></p><form id="af"><label>Besked til virksomheden<textarea name="m" rows="3" placeholder="Fortæl kort, hvorfor du gerne vil have jobbet"></textarea></label><button class="btn" type="submit">Send ansøgning</button></form><button class="rep" type="button">Anmeld opslag</button>';
+ B.querySelector("h3").textContent=j.t;B.querySelector(".mm").textContent=j.firm+", "+j.area+" · "+j.wage+" kr. i timen · "+j.hrs;
+ B.querySelector(".who").textContent="Du ansøger som "+prof.n+". "+(prof.cv?"Dit CV ("+prof.cv.name+") følger med.":"Du har ikke uploadet et CV endnu.");
+ B.querySelector(".x").onclick=function(){d.close()};
+ B.querySelector(".rep").onclick=function(){d.close();toast("Tak. Vi kigger på opslaget.")};
+ B.querySelector("#af").onsubmit=function(e){e.preventDefault();mine.push(j.id);sav=sav.filter(function(x){return x!==j.id});put("v2_app",mine);put("v2_sav",sav);d.close();lists();toast("Ansøgning sendt til "+j.firm+".")};
+ d.showModal();
+}
+function pdlg(){
+ var d=$("#dlg"),B=$("#db"),p=prof||{};
+ B.innerHTML='<div class="top"><h3>Din profil</h3><button class="x" aria-label="Luk" type="button">×</button></div><p>Lav din profil én gang. Så følger den og dit CV med, hver gang du ansøger.</p><form id="pf">'+
+ '<label>Alder<select name="al"></select></label><p class="warn" hidden>Børn under 13 år må som udgangspunkt ikke have et job. Kom tilbage, når du fylder 13.</p>'+
+ '<label>Fulde navn<input name="n" required autocomplete="name"></label><label>By<input name="c" required></label>'+
+ '<label>Hvornår kan du arbejde?<input name="a" placeholder="fx hverdage efter kl. 15"></label><label>Om dig<textarea name="b" rows="3"></textarea></label>'+
+ '<label>CV (pdf eller Word, max 1 MB)<input type="file" name="f" accept=".pdf,.doc,.docx"></label><p class="cvn"></p>'+
+ '<div id="par"><label>Forælders e-mail<input name="p" type="email"></label><label class="chk"><input name="k" type="checkbox"><span>Min forælder ved det og er indforstået med, at jeg bruger Treak.</span></label></div>'+
+ '<button class="btn" id="sv" type="submit">Gem profil og find job</button></form>';
+ var f=B.querySelector("#pf"),w=B.querySelector(".warn"),par=B.querySelector("#par");
+ var opt=function(v,t){var o=document.createElement("option");o.value=v;o.textContent=t;f.al.appendChild(o)};
+ if(!prof)opt("","Vælg din alder");opt(12,"Under 13");for(var i=13;i<=21;i++)opt(i,i+" år");
+ f.al.value=prof?age:"";f.n.value=p.n||"";f.c.value=p.c||"";f.a.value=p.a||"";f.b.value=p.b||"";f.p.value=p.p||"";
+ var upd=function(){var v=f.al.value,a=+v,y=!!v&&a>=13&&a<15;w.hidden=!v||a>=13;par.style.display=y?"grid":"none";f.p.required=y;f.k.required=y;B.querySelector("#sv").disabled=!v||a<13};
+ f.al.onchange=upd;upd();
+ B.querySelector(".x").onclick=function(){d.close()};
+ var cn=B.querySelector(".cvn");
+ if(p.cv){var a=document.createElement("a");a.href=p.cv.data;a.download=p.cv.name;a.textContent=p.cv.name;cn.append("Uploadet: ",a," ");
+  var r=document.createElement("button");r.type="button";r.className="rep";r.textContent="Fjern CV";
+  r.onclick=function(){prof.cv=null;put("v2_prof",prof);pdlg();toast("CV fjernet.")};cn.append(r)}
+ f.onsubmit=function(e){e.preventDefault();var ag=+f.al.value,y=ag<15;
+  var file=f.f.files[0],go=function(cv){
+   var np={n:f.n.value,c:f.c.value,a:f.a.value,b:f.b.value,p:y?f.p.value:"",cv:cv};
+   if(!put("v2_prof",np)){toast("Profilen kunne ikke gemmes. Prøv en mindre CV-fil.");return}
+   prof=np;age=ag;skip=[];$("#rg").value=Math.min(21,Math.max(13,ag));d.close();toast("Profil gemt. Nu kan du finde dit job.");$("#find").scrollIntoView()};
+  if(!file)return go(p.cv||null);
+  if(file.size>1048576){toast("CV-filen er for stor. Max 1 MB.");return}
+  var rd=new FileReader();rd.onload=function(){go({name:file.name,data:rd.result})};rd.readAsDataURL(file)};
+ d.showModal();
+}
+function row(j,saved){var e=document.createElement("li"),s=document.createElement("span");s.textContent=j.t+" · "+j.firm;e.append(s);
+ if(saved){var a=document.createElement("button");a.className="mini";a.textContent="Ansøg";a.onclick=function(){applyJob(j)};
+  var r=document.createElement("button");r.className="mini";r.textContent="Fjern";r.onclick=function(){sav=sav.filter(function(x){return x!==j.id});put("v2_sav",sav);deck();lists()};e.append(a,r)}
+ else{var m=document.createElement("em");m.textContent="Sendt";e.append(m)}return e}
+function lists(){
+ [["#ls",sav,1,"Intet gemt endnu. Tryk Gem på et kort."],["#la",mine,0,"Du har ikke ansøgt endnu."]].forEach(function(x){
+  var u=$(x[0]);u.innerHTML="";var js=JOBS.filter(function(j){return x[1].indexOf(j.id)>-1});
+  if(!js.length){var e=document.createElement("li");e.className="mute";e.textContent=x[3];u.appendChild(e)}
+  js.forEach(function(j){u.appendChild(row(j,x[2]))})})}
+
+$("#rg").oninput=function(){age=+this.value;skip=[];deck()};
+$("#u13").onclick=function(){age=12;deck()};
+$("#bs").onclick=function(){fly(-1)};$("#ba").onclick=function(){fly(1)};$("#bg").onclick=function(){saveJob(cur)};
+$("#pbtn").onclick=pdlg;$("#go").onclick=pdlg;
+$("#dlg").addEventListener("close",deck);
+$("#dlg").addEventListener("click",function(e){if(e.target===this)this.close()});
+document.addEventListener("keydown",function(e){if($("#dlg").open||/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))return;
+ if(e.key==="ArrowRight")fly(1);if(e.key==="ArrowLeft")fly(-1)});
+$("#go2").onclick=pdlg;
+deck();lists();
+</script>
+</body>
+</html>
