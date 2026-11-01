@@ -108,7 +108,12 @@ input:focus,select:focus,textarea:focus{border-color:var(--li)}
 .warn{background:var(--bg2);border-radius:10px;padding:10px 12px;font-size:15px}
 #par{display:grid;gap:14px}
 dialog{border:0;border-radius:22px;padding:0;width:min(560px,94vw);max-height:92vh;background:var(--pane);color:var(--ink)}
+dialog{margin:auto}
 dialog::backdrop{background:rgba(10,5,25,.6)}
+dialog[open]{animation:pop .35s cubic-bezier(.2,.9,.3,1.15)}
+dialog[open]::backdrop{animation:fade .3s ease}
+@keyframes pop{from{opacity:0;transform:translateY(28px) scale(.93)}to{opacity:1;transform:none}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
 .dlg{padding:28px}
 .dlg h3{font:800 28px/1.05 var(--d);letter-spacing:-.03em}
 .dlg .top{display:flex;justify-content:space-between;gap:12px}
@@ -121,12 +126,12 @@ dialog::backdrop{background:rgba(10,5,25,.6)}
 #toast.on{transform:translate(-50%,0)}
 footer{background:var(--ink);color:#a9a0cf;font-size:14px;padding:28px 0;border-top:1px solid #2c2347}
 @media(max-width:860px){.hero-g,.two,.boxes,.feat-g,.row{grid-template-columns:1fr}.navr a{display:none}section{padding:56px 0}.hero{padding:40px 0 56px}.feat{padding-bottom:56px}.prev{height:340px;margin-top:24px}.fl.a{right:-4px}.fl.b{left:-6px}}
-@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
 <div class="proto">Prototype: jobbene er eksempler, og der sendes endnu ikke noget til virksomheder.</div>
-<header class="site"><div class="wrap"><nav><a class="logo" href="#top"><i></i>Treak</a><div class="navr"><a href="#find">Find job</a><a href="#mine">Mine jobs</a><button class="pill" id="pbtn" type="button">Min profil</button></div></nav></div></header>
+<header class="site"><div class="wrap"><nav><a class="logo" href="#top"><i></i>Treak</a><div class="navr"><a href="#find">Find job</a><a href="#mine">Mine jobs</a><button class="pill" id="pbtn" type="button">Opret profil</button></div></nav></div></header>
 <main>
 <section class="hero" id="top"><div class="wrap hero-g">
 <div>
@@ -197,7 +202,7 @@ async function loadMe(){
   prof=q[0].data;mine=(q[1].data||[]).map(function(x){return x.job_id});sav=(q[2].data||[]).map(function(x){return x.job_id});
   if(prof){age=prof.age;$("#rg").value=Math.min(21,Math.max(13,age))}
  }
- $("#pbtn").textContent=user?"Min profil":"Log ind";
+ $("#pbtn").textContent=user?"Min profil":"Opret profil";
 }
 async function refresh(){await loadMe();skip=[];deck();lists()}
 
