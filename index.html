@@ -113,6 +113,7 @@ dialog::backdrop{background:rgba(10,5,25,.6)}
 .dlg h3{font:800 28px/1.05 var(--d);letter-spacing:-.03em}
 .dlg .top{display:flex;justify-content:space-between;gap:12px}
 .dlg p{margin:10px 0}
+.dlg .pst{margin-top:0}
 .dlg .mini{border-color:var(--ink)}
 .x{background:none;border:0;font-size:28px;cursor:pointer;line-height:1}
 .rep{background:none;border:0;text-decoration:underline;cursor:pointer;font-size:14px;padding:0}
@@ -172,28 +173,37 @@ footer{background:var(--ink);color:#a9a0cf;font-size:14px;padding:28px 0;border-
 <dialog id="dlg"><div class="dlg" id="db"></div></dialog>
 <div id="toast" role="status"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.js"></script>
 <script>
-var JOBS=[
-{id:1,t:"Hjælper i bageri",firm:"Bageri (eksempel)",area:"Nørrebro",cat:"Butik",min:13,light:1,wage:78,hrs:"Lørdage 8-13",d:"Fyld hylder op, pak brød og sig hej til kunderne. Kassen er ikke en del af jobbet."},
-{id:2,t:"Oprydning på legeplads",firm:"Fritidsklub (eksempel)",area:"Amager",cat:"Service",min:13,light:1,wage:72,hrs:"Efter skole, 2 dage",d:"Let oprydning af legetøj og borde. En voksen viser dig, hvad du skal gøre."},
-{id:3,t:"Aviser på cykel",firm:"Lokalavis (eksempel)",area:"Frederiksberg",cat:"Udendørs",min:13,light:1,wage:65,hrs:"Torsdag eftermiddag",d:"Du deler aviser ud i et lille område tæt på dit hjem."},
-{id:4,t:"Hundelufter",firm:"Dyrepension (eksempel)",area:"Valby",cat:"Udendørs",min:13,light:1,wage:70,hrs:"Hverdage 15-17",d:"Gå tur med rolige hunde to ad gangen. En voksen vælger, hvilke hunde du må tage."},
-{id:5,t:"Pizzabud",firm:"Pizzeria (eksempel)",area:"Vesterbro",cat:"Mad",min:15,light:0,wage:92,hrs:"Fre-lør 17-21",d:"Lever pizzaer i nærområdet på cykel. Hjelm er et krav, og vi har en til dig."},
-{id:6,t:"Køkkenhjælp",firm:"Café (eksempel)",area:"Østerbro",cat:"Mad",min:15,light:0,wage:95,hrs:"Weekender 9-15",d:"Skær grønt, vask op og hold orden. Du lærer grundlæggende køkkenhygiejne."},
-{id:7,t:"Kassemedarbejder",firm:"Dagligvarebutik (eksempel)",area:"Nørrebro",cat:"Butik",min:16,light:0,wage:112,hrs:"Aftener og weekender",d:"Sid i kassen og hjælp kunder. Du bliver trænet de første to vagter."},
-{id:8,t:"Lagermedarbejder",firm:"Webshop (eksempel)",area:"Hvidovre",cat:"Service",min:18,light:0,wage:135,hrs:"Hverdage 8-16",d:"Pak ordrer, scan varer og hold styr på lageret. Kræver, at du er fyldt 18."}
-];
+var SB_URL="https://myttauwgkbjlezoaabxk.supabase.co",SB_KEY="sb_publishable_wMLtdLFDbNoiCBkTMHdp1g_uCzUEnrP";
+var sb=supabase.createClient(SB_URL,SB_KEY);
 var CI={"Butik":1,"Mad":2,"Service":3,"Udendørs":4};
-var age=15,skip=[],mine=[],sav=[],prof=null,cur=null;
-try{mine=JSON.parse(localStorage.getItem("v2_app"))||[];sav=JSON.parse(localStorage.getItem("v2_sav"))||[];prof=JSON.parse(localStorage.getItem("v2_prof"))}catch(e){}
+var JOBS=[],age=15,skip=[],mine=[],sav=[],prof=null,user=null,cur=null,loaded=false;
 var $=function(s){return document.querySelector(s)};
-function put(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}
 function ok(j){return age>=j.min&&(age>=15||j.light)}
-function toast(m){var t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(toast.h);toast.h=setTimeout(function(){t.classList.remove("on")},3600)}
+function toast(m){var t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(toast.h);toast.h=setTimeout(function(){t.classList.remove("on")},4200)}
 function label(){$("#al").textContent=age<13?"Jeg er under 13 år":"Jeg er "+age+" år"}
+function need(){if(!user){toast("Log ind for at fortsætte.");ldlg();return false}return true}
+
+async function loadJobs(){
+ var r=await sb.from("jobs").select("*").eq("status","aktiv").order("id");
+ if(r.error){toast("Kunne ikke hente jobs. Prøv igen om lidt.");return}
+ JOBS=r.data.map(function(j){return{id:j.id,t:j.title,firm:j.firm,area:j.area,cat:j.category,min:j.min_age,light:j.light_work,wage:j.wage,hrs:j.hours,d:j.description}});
+}
+async function loadMe(){
+ var s=await sb.auth.getSession();user=s.data.session?s.data.session.user:null;prof=null;mine=[];sav=[];
+ if(user){
+  var q=await Promise.all([sb.from("profiles").select("*").eq("id",user.id).maybeSingle(),sb.from("applications").select("job_id"),sb.from("saved_jobs").select("job_id")]);
+  prof=q[0].data;mine=(q[1].data||[]).map(function(x){return x.job_id});sav=(q[2].data||[]).map(function(x){return x.job_id});
+  if(prof){age=prof.age;$("#rg").value=Math.min(21,Math.max(13,age))}
+ }
+ $("#pbtn").textContent=user?"Min profil":"Log ind";
+}
+async function refresh(){await loadMe();skip=[];deck();lists()}
 
 function deck(){
  var D=$("#deck");D.innerHTML="";cur=null;label();
+ if(!loaded){$("#acts").hidden=true;$("#info").textContent="";D.innerHTML='<div class="end"><p>Henter jobs...</p></div>';return}
  if(age<13){$("#acts").hidden=true;$("#info").textContent="";
   D.innerHTML='<div class="end"><h3>Du er for ung endnu</h3><p>Børn under 13 år må som udgangspunkt ikke have et job. Kom tilbage, når du fylder 13.</p></div>';return}
  var L=JOBS.filter(function(j){return ok(j)&&skip.indexOf(j.id)<0&&mine.indexOf(j.id)<0&&sav.indexOf(j.id)<0});
@@ -208,7 +218,7 @@ function deck(){
   c.innerHTML='<div class="firm"></div><div><h3></h3><div class="w"></div></div><div><p class="desc"></p><div class="tgs"></div></div>';
   c.querySelector(".firm").textContent=j.firm+", "+j.area;c.querySelector("h3").textContent=j.t;
   c.querySelector(".w").innerHTML=j.wage+' kr.<small>i timen</small>';c.querySelector(".desc").textContent=j.d;
-  [ "Fra "+j.min+" år",j.hrs].concat(j.light?["Lettere arbejde"]:[]).forEach(function(t){var s=document.createElement("span");s.className="tg";s.textContent=t;c.querySelector(".tgs").appendChild(s)});
+  ["Fra "+j.min+" år",j.hrs].concat(j.light?["Lettere arbejde"]:[]).forEach(function(t){var s=document.createElement("span");s.className="tg";s.textContent=t;c.querySelector(".tgs").appendChild(s)});
   D.appendChild(c);if(k===0)drag(c)});
 }
 function drag(c){
@@ -222,51 +232,111 @@ function fly(dir){var t=$("#deck .top");if(!t||!cur)return;var j=cur;cur=null;t.
  t.style.transform="translateX("+dir*520+"px) rotate("+dir*18+"deg)";
  setTimeout(function(){dir>0?applyJob(j):skipJob(j)},220)}
 function skipJob(j){skip.push(j.id);deck()}
-function saveJob(j){if(!j)return;sav.push(j.id);put("v2_sav",sav);toast("Gemt under Mine jobs.");deck();lists()}
+
+async function saveJob(j){
+ if(!j||!need())return;
+ var r=await sb.from("saved_jobs").insert({user_id:user.id,job_id:j.id});
+ if(r.error&&r.error.code!=="23505"){toast("Kunne ikke gemme jobbet.");return}
+ if(sav.indexOf(j.id)<0)sav.push(j.id);toast("Gemt under Dine jobs.");deck();lists();
+}
+async function unsave(j){
+ var r=await sb.from("saved_jobs").delete().eq("user_id",user.id).eq("job_id",j.id);
+ if(r.error){toast("Kunne ikke fjerne jobbet.");return}
+ sav=sav.filter(function(x){return x!==j.id});deck();lists();
+}
+function box(title,html){
+ var B=$("#db");B.innerHTML='<div class="top"><h3></h3><button class="x" aria-label="Luk" type="button">×</button></div>'+html;
+ B.querySelector("h3").textContent=title;B.querySelector(".x").onclick=function(){$("#dlg").close()};return B;
+}
 function applyJob(j){
- if(!prof){toast("Opret først din profil med CV.");deck();pdlg();return}
- var d=$("#dlg"),B=$("#db");
- B.innerHTML='<div class="top"><h3></h3><button class="x" aria-label="Luk" type="button">×</button></div><p class="mm"></p><p class="who"></p><form id="af"><label>Besked til virksomheden<textarea name="m" rows="3" placeholder="Fortæl kort, hvorfor du gerne vil have jobbet"></textarea></label><button class="btn" type="submit">Send ansøgning</button></form><button class="rep" type="button">Anmeld opslag</button>';
- B.querySelector("h3").textContent=j.t;B.querySelector(".mm").textContent=j.firm+", "+j.area+" · "+j.wage+" kr. i timen · "+j.hrs;
- B.querySelector(".who").textContent="Du ansøger som "+prof.n+". "+(prof.cv?"Dit CV ("+prof.cv.name+") følger med.":"Du har ikke uploadet et CV endnu.");
- B.querySelector(".x").onclick=function(){d.close()};
+ if(!need())return;
+ if(!prof){toast("Opret først din profil med CV.");pdlg();return}
+ var d=$("#dlg");
+ if(prof.parent_status==="afventer"){box("Din forælder skal godkende","<p>Fordi du er under 15 år, skal en forælder godkende din profil, før du kan ansøge. Godkendelsen kommer snart.</p>");d.showModal();return}
+ var B=box(j.t,'<p class="mm"></p><p class="who"></p><form id="af"><label>Besked til virksomheden<textarea name="m" rows="3" maxlength="1000" placeholder="Fortæl kort, hvorfor du gerne vil have jobbet"></textarea></label><button class="btn" type="submit">Send ansøgning</button></form><button class="rep" type="button">Anmeld opslag</button>');
+ B.querySelector(".mm").textContent=j.firm+", "+j.area+" · "+j.wage+" kr. i timen · "+j.hrs;
+ B.querySelector(".who").textContent="Du ansøger som "+prof.name+". "+(prof.cv_name?"Dit CV ("+prof.cv_name+") følger med.":"Du har ikke uploadet et CV endnu.");
  B.querySelector(".rep").onclick=function(){d.close();toast("Tak. Vi kigger på opslaget.")};
- B.querySelector("#af").onsubmit=function(e){e.preventDefault();mine.push(j.id);sav=sav.filter(function(x){return x!==j.id});put("v2_app",mine);put("v2_sav",sav);d.close();lists();toast("Ansøgning sendt til "+j.firm+".")};
+ var f=B.querySelector("#af");
+ f.onsubmit=async function(e){e.preventDefault();var b=f.querySelector("button");b.disabled=true;
+  var r=await sb.from("applications").insert({user_id:user.id,job_id:j.id,message:f.m.value.trim()||null});
+  b.disabled=false;
+  if(r.error&&r.error.code!=="23505"){toast(r.error.code==="42501"?"Du kan ikke ansøge dette job endnu.":"Ansøgningen kunne ikke sendes.");return}
+  if(mine.indexOf(j.id)<0)mine.push(j.id);
+  await sb.from("saved_jobs").delete().eq("user_id",user.id).eq("job_id",j.id);sav=sav.filter(function(x){return x!==j.id});
+  d.close();lists();toast("Ansøgning sendt til "+j.firm+".")};
  d.showModal();
 }
+
+function ldlg(){
+ var d=$("#dlg"),B=box("Log ind",'<p>Skriv din e-mail, så sender vi en kode. Du skal ikke bruge en adgangskode.</p><form id="lf"><label>E-mail<input name="e" type="email" required autocomplete="email"></label><button class="btn" type="submit">Send kode</button></form>');
+ var f=B.querySelector("#lf");
+ f.onsubmit=async function(e){e.preventDefault();var em=f.e.value.trim(),b=f.querySelector("button");b.disabled=true;
+  var r=await sb.auth.signInWithOtp({email:em,options:{shouldCreateUser:true}});b.disabled=false;
+  if(r.error){toast("Kunne ikke sende kode. Tjek e-mailen og prøv igen.");return}
+  var B2=box("Skriv din kode",'<p class="to"></p><form id="cf2"><label>Kode<input name="c" inputmode="numeric" autocomplete="one-time-code" required maxlength="10"></label><button class="btn" type="submit">Log ind</button></form><button class="rep" type="button">Brug en anden e-mail</button>');
+  B2.querySelector(".to").textContent="Vi har sendt en kode til "+em+". Det kan tage et minut.";
+  B2.querySelector(".rep").onclick=ldlg;
+  var g=B2.querySelector("#cf2");
+  g.onsubmit=async function(ev){ev.preventDefault();var bb=g.querySelector("button");bb.disabled=true;
+   var v=await sb.auth.verifyOtp({email:em,token:g.c.value.trim(),type:"email"});bb.disabled=false;
+   if(v.error){toast("Koden passer ikke eller er udløbet.");return}
+   await refresh();d.close();toast("Du er logget ind.");if(!prof)pdlg()}};
+ d.showModal();
+}
+async function wipe(){
+ if(!confirm("Vil du slette din profil, dit CV og alle dine ansøgninger? Det kan ikke fortrydes."))return;
+ if(prof&&prof.cv_path)await sb.storage.from("cv").remove([prof.cv_path]);
+ await sb.from("applications").delete().eq("user_id",user.id);
+ await sb.from("saved_jobs").delete().eq("user_id",user.id);
+ await sb.from("profiles").delete().eq("id",user.id);
+ await sb.auth.signOut();$("#dlg").close();await refresh();toast("Dine data er slettet.");
+}
 function pdlg(){
- var d=$("#dlg"),B=$("#db"),p=prof||{};
- B.innerHTML='<div class="top"><h3>Din profil</h3><button class="x" aria-label="Luk" type="button">×</button></div><p>Lav din profil én gang. Så følger den og dit CV med, hver gang du ansøger.</p><form id="pf">'+
+ if(!need())return;
+ var d=$("#dlg"),p=prof||{};
+ var B=box("Din profil",'<p>Lav din profil én gang. Så følger den og dit CV med, hver gang du ansøger.</p><form id="pf">'+
  '<label>Alder<select name="al"></select></label><p class="warn" hidden>Børn under 13 år må som udgangspunkt ikke have et job. Kom tilbage, når du fylder 13.</p>'+
- '<label>Fulde navn<input name="n" required autocomplete="name"></label><label>By<input name="c" required></label>'+
- '<label>Hvornår kan du arbejde?<input name="a" placeholder="fx hverdage efter kl. 15"></label><label>Om dig<textarea name="b" rows="3"></textarea></label>'+
+ '<label>Fulde navn<input name="n" required maxlength="100" autocomplete="name"></label><label>By<input name="c" required maxlength="100"></label>'+
+ '<label>Hvornår kan du arbejde?<input name="a" maxlength="200" placeholder="fx hverdage efter kl. 15"></label><label>Om dig<textarea name="b" rows="3" maxlength="1000"></textarea></label>'+
  '<label>CV (pdf eller Word, max 1 MB)<input type="file" name="f" accept=".pdf,.doc,.docx"></label><p class="cvn"></p>'+
- '<div id="par"><label>Forælders e-mail<input name="p" type="email"></label><label class="chk"><input name="k" type="checkbox"><span>Min forælder ved det og er indforstået med, at jeg bruger Treak.</span></label></div>'+
- '<button class="btn" id="sv" type="submit">Gem profil og find job</button></form>';
+ '<div id="par"><label>Forælders e-mail<input name="p" type="email" maxlength="200"></label></div><p class="warn pst" hidden></p>'+
+ '<button class="btn" id="sv" type="submit">Gem profil og find job</button></form><p style="margin-top:16px"><button class="rep" id="lo" type="button">Log ud</button>'+(prof?' · <button class="rep" id="wp" type="button">Slet mine data</button>':'')+'</p>');
  var f=B.querySelector("#pf"),w=B.querySelector(".warn"),par=B.querySelector("#par");
  var opt=function(v,t){var o=document.createElement("option");o.value=v;o.textContent=t;f.al.appendChild(o)};
  if(!prof)opt("","Vælg din alder");opt(12,"Under 13");for(var i=13;i<=21;i++)opt(i,i+" år");
- f.al.value=prof?age:"";f.n.value=p.n||"";f.c.value=p.c||"";f.a.value=p.a||"";f.b.value=p.b||"";f.p.value=p.p||"";
- var upd=function(){var v=f.al.value,a=+v,y=!!v&&a>=13&&a<15;w.hidden=!v||a>=13;par.style.display=y?"grid":"none";f.p.required=y;f.k.required=y;B.querySelector("#sv").disabled=!v||a<13};
+ f.al.value=prof?p.age:"";f.n.value=p.name||"";f.c.value=p.city||"";f.a.value=p.availability||"";f.b.value=p.about||"";f.p.value=p.parent_email||"";
+ var upd=function(){var v=f.al.value,a=+v,y=!!v&&a>=13&&a<15;w.hidden=!v||a>=13;par.style.display=y?"grid":"none";f.p.required=y;B.querySelector("#sv").disabled=!v||a<13};
  f.al.onchange=upd;upd();
- B.querySelector(".x").onclick=function(){d.close()};
+ var ps=B.querySelector(".pst");
+ if(prof&&prof.age<15){ps.hidden=false;ps.textContent=prof.parent_status==="godkendt"?"Din forælder har godkendt din profil.":"Din forælder skal godkende din profil, før du kan ansøge. Godkendelsen kommer snart."}
  var cn=B.querySelector(".cvn");
- if(p.cv){var a=document.createElement("a");a.href=p.cv.data;a.download=p.cv.name;a.textContent=p.cv.name;cn.append("Uploadet: ",a," ");
+ if(p.cv_path){var a=document.createElement("button");a.type="button";a.className="rep";a.textContent=p.cv_name;
+  a.onclick=async function(){var s=await sb.storage.from("cv").createSignedUrl(p.cv_path,60);if(s.data)window.open(s.data.signedUrl,"_blank");else toast("Kunne ikke åbne CV'et.")};
   var r=document.createElement("button");r.type="button";r.className="rep";r.textContent="Fjern CV";
-  r.onclick=function(){prof.cv=null;put("v2_prof",prof);pdlg();toast("CV fjernet.")};cn.append(r)}
- f.onsubmit=function(e){e.preventDefault();var ag=+f.al.value,y=ag<15;
-  var file=f.f.files[0],go=function(cv){
-   var np={n:f.n.value,c:f.c.value,a:f.a.value,b:f.b.value,p:y?f.p.value:"",cv:cv};
-   if(!put("v2_prof",np)){toast("Profilen kunne ikke gemmes. Prøv en mindre CV-fil.");return}
-   prof=np;age=ag;skip=[];$("#rg").value=Math.min(21,Math.max(13,ag));d.close();toast("Profil gemt. Nu kan du finde dit job.");$("#find").scrollIntoView()};
-  if(!file)return go(p.cv||null);
-  if(file.size>1048576){toast("CV-filen er for stor. Max 1 MB.");return}
-  var rd=new FileReader();rd.onload=function(){go({name:file.name,data:rd.result})};rd.readAsDataURL(file)};
+  r.onclick=async function(){await sb.storage.from("cv").remove([p.cv_path]);var u=await sb.from("profiles").update({cv_path:null,cv_name:null}).eq("id",user.id).select().single();if(u.data)prof=u.data;pdlg();toast("CV fjernet.")};
+  cn.append("Uploadet: ",a," · ",r)}
+ B.querySelector("#lo").onclick=async function(){await sb.auth.signOut();d.close();await refresh();toast("Du er logget ud.")};
+ if(prof)B.querySelector("#wp").onclick=wipe;
+ f.onsubmit=async function(e){e.preventDefault();var ag=+f.al.value,y=ag<15,file=f.f.files[0],b=B.querySelector("#sv"),path=p.cv_path||null,cvn=p.cv_name||null;
+  if(file){
+   if(!/\.(pdf|doc|docx)$/i.test(file.name)){toast("CV skal være pdf eller Word.");return}
+   if(file.size>1048576){toast("CV-filen er for stor. Max 1 MB.");return}
+   b.disabled=true;var np=user.id+"/"+Date.now()+"."+file.name.split(".").pop().toLowerCase();
+   var u=await sb.storage.from("cv").upload(np,file,{contentType:file.type||undefined});
+   if(u.error){toast("CV'et kunne ikke uploades.");b.disabled=false;return}
+   if(path)await sb.storage.from("cv").remove([path]);path=np;cvn=file.name}
+  b.disabled=true;
+  var r=await sb.from("profiles").upsert({id:user.id,name:f.n.value.trim(),city:f.c.value.trim(),age:ag,availability:f.a.value.trim()||null,about:f.b.value.trim()||null,parent_email:y?f.p.value.trim():null,cv_path:path,cv_name:cvn}).select().single();
+  b.disabled=false;
+  if(r.error){toast("Profilen kunne ikke gemmes. Prøv igen.");return}
+  prof=r.data;age=ag;skip=[];$("#rg").value=Math.min(21,Math.max(13,ag));d.close();
+  toast(prof.parent_status==="afventer"?"Profil gemt. Din forælder skal godkende, før du kan ansøge.":"Profil gemt. Nu kan du finde dit job.");$("#find").scrollIntoView()};
  d.showModal();
 }
 function row(j,saved){var e=document.createElement("li"),s=document.createElement("span");s.textContent=j.t+" · "+j.firm;e.append(s);
  if(saved){var a=document.createElement("button");a.className="mini";a.textContent="Ansøg";a.onclick=function(){applyJob(j)};
-  var r=document.createElement("button");r.className="mini";r.textContent="Fjern";r.onclick=function(){sav=sav.filter(function(x){return x!==j.id});put("v2_sav",sav);deck();lists()};e.append(a,r)}
+  var r=document.createElement("button");r.className="mini";r.textContent="Fjern";r.onclick=function(){unsave(j)};e.append(a,r)}
  else{var m=document.createElement("em");m.textContent="Sendt";e.append(m)}return e}
 function lists(){
  [["#ls",sav,1,"Intet gemt endnu. Tryk Gem på et kort."],["#la",mine,0,"Du har ikke ansøgt endnu."]].forEach(function(x){
@@ -274,16 +344,17 @@ function lists(){
   if(!js.length){var e=document.createElement("li");e.className="mute";e.textContent=x[3];u.appendChild(e)}
   js.forEach(function(j){u.appendChild(row(j,x[2]))})})}
 
+function entry(){user?pdlg():ldlg()}
+$("#pbtn").onclick=entry;$("#go").onclick=entry;$("#go2").onclick=entry;
 $("#rg").oninput=function(){age=+this.value;skip=[];deck()};
 $("#u13").onclick=function(){age=12;deck()};
 $("#bs").onclick=function(){fly(-1)};$("#ba").onclick=function(){fly(1)};$("#bg").onclick=function(){saveJob(cur)};
-$("#pbtn").onclick=pdlg;$("#go").onclick=pdlg;
 $("#dlg").addEventListener("close",deck);
 $("#dlg").addEventListener("click",function(e){if(e.target===this)this.close()});
 document.addEventListener("keydown",function(e){if($("#dlg").open||/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))return;
  if(e.key==="ArrowRight")fly(1);if(e.key==="ArrowLeft")fly(-1)});
-$("#go2").onclick=pdlg;
 deck();lists();
+(async function(){await loadJobs();await loadMe();loaded=true;deck();lists()})();
 </script>
 </body>
 </html>
